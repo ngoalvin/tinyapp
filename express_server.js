@@ -67,6 +67,13 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(`/urls/${currentURL}`);
 })
 
+app.post("/urls/:shortURL/edit", (req, res) => {
+  const currentShortUrl = req.params.shortURL
+  urlDatabase[currentShortUrl] = req.body.longURL
+  res.redirect(`/urls/${currentShortUrl}`)
+})
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
