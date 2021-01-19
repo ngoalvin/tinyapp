@@ -16,7 +16,8 @@ const generateRandomString = function() {
     output += validChars.charAt(Math.floor(Math.random() * validChars.length));
   }
   return output;
-}
+};
+
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -72,6 +73,13 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const currentShortUrl = req.params.shortURL
   urlDatabase[currentShortUrl] = req.body.longURL
   res.redirect(`/urls/${currentShortUrl}`)
+})
+
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  console.log("here")
+  res.redirect("/urls");
+ 
 })
 
 
