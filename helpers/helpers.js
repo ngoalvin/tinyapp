@@ -50,5 +50,23 @@ const userDatabase = function(userID, urlDatabase) {
   return newDatabase;
 };
 
+const statusMessage = function(status) {
+  if (status === 200) {
+    return 'OK';
+  } else if (status === 403) {
+    return 'Please enter a valid email and password';
+  } else if (status === 400) {
+    return 'The email already exists';
+  } else if (status === 409) {
+    return 'This already exists think of something more original please'
+  }
+}
 
-module.exports = { generateRandomString, emailExist, getUserByEmail, hashPassword, isEqualToHash, userDatabase };
+module.exports = { 
+  generateRandomString, 
+  emailExist, 
+  getUserByEmail, 
+  hashPassword, 
+  isEqualToHash, 
+  userDatabase, 
+  statusMessage };
