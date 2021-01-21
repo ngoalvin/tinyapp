@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const generateRandomString = function() {
   let output = '';
   const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -25,4 +27,8 @@ const lookUpAccount = function(users, email) {
   return {};
 }
 
-module.exports = { generateRandomString, emailExist, lookUpAccount }
+const hashPassword = function(password) {
+  return bcrypt.hashSync(password, 10);
+}
+
+module.exports = { generateRandomString, emailExist, lookUpAccount, hashPassword }
