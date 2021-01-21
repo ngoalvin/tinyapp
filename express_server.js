@@ -8,7 +8,8 @@ const {
   hashPassword, 
   isEqualToHash, 
   userDatabase,
-  statusMessage
+  statusMessage,
+  changeStatus
   } = require("./helpers/helpers");
 
 const cookieSession = require('cookie-session');
@@ -41,14 +42,19 @@ let isLoggedIn = false;
 
 app.get("/urls", (req, res) => {
   status = res.statusCode;
-  const userID = req.session.userID;
-  const usersUrl = userDatabase(userID, urlDatabase);
-  const templateVars = {
-    urls : usersUrl,
-    userID,
-    isLoggedIn,
-  };
-  res.render("urls_index", templateVars);
+  if (!isLoggedIn) {
+    status = changeStatus(res.statusCode, 401);
+    res.redirect("/status")
+  } else {
+    const userID = req.session.userID;
+    const usersUrl = userDatabase(userID, urlDatabase);
+    const templateVars = {
+      userID,
+      isLoggedIn,
+      urls : usersUrl,
+    };
+    res.render("urls_index", templateVars);
+  }
 });
 
 app.post("/urls", (req, res) => {
@@ -135,12 +141,10 @@ app.post("/register", (req, res) => {
   const hashedPassword = hashPassword(password);
 
   if (!(email && password)) {
-    res.statusCode = 400;
-    status = res.statusCode;
+    status = changeStatus(res.statusCode, 400)
     res.redirect("/status")
   } else if (emailExist(users, email)) {
-    res.statusCode = 409;
-    status = res.statusCode;
+    status = changeStatus(res.statusCode, 409)
     res.redirect("/status");
   } else {
     users[id] = {
@@ -149,7 +153,7 @@ app.post("/register", (req, res) => {
       hashedPassword
     };
     req.session.userID = id;
-    res.redirect("/urls");
+    res.redirect("/");
   }
 });
 
@@ -158,7 +162,7 @@ app.post("/register", (req, res) => {
 app.post("/logout", (req,res) => {
   req.session.userID = null;
   isLoggedIn = false;
-  res.redirect("/urls");
+  res.redirect("/");
 });
 
 app.get("/login", (req, res) => {
@@ -175,8 +179,7 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const currentAccount = getUserByEmail(email, users);
   if (!emailExist(users, email) || !isEqualToHash(password, currentAccount.hashedPassword)) {
-    res.statusCode = 403;
-    status = res.statusCode;
+    status = changeStatus(res.statusCode, 403)
     res.redirect("/status")
   } else {
     req.session.userID = currentAccount.id;
@@ -186,7 +189,6 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/status", (req, res) => {
-  status = res.statusCode;
   const templateVars = {
     status,
     message : statusMessage(status)

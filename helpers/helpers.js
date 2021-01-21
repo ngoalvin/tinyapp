@@ -59,7 +59,14 @@ const statusMessage = function(status) {
     return 'The email already exists';
   } else if (status === 409) {
     return 'This already exists think of something more original please'
+  } else if (status === 401) {
+    return 'You not logged in bro';
   }
+}
+
+const changeStatus = function(status, code) {
+  status = code;
+  return status;
 }
 
 module.exports = { 
@@ -69,4 +76,6 @@ module.exports = {
   hashPassword, 
   isEqualToHash, 
   userDatabase, 
-  statusMessage };
+  statusMessage,
+  changeStatus
+};
