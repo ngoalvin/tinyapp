@@ -31,4 +31,8 @@ const hashPassword = function(password) {
   return bcrypt.hashSync(password, 10);
 }
 
-module.exports = { generateRandomString, emailExist, lookUpAccount, hashPassword }
+const isEqualToHash = function(password, hashedPassword) {
+  return bcrypt.compareSync(password, hashedPassword);
+}
+
+module.exports = { generateRandomString, emailExist, lookUpAccount, hashPassword, isEqualToHash }

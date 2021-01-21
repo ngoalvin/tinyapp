@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const {generateRandomString, emailExist, lookUpAccount, hashPassword} = require("./helpers/helpers");
+const {generateRandomString, emailExist, lookUpAccount, hashPassword, isEqualToHash} = require("./helpers/helpers");
 
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
@@ -123,7 +123,7 @@ app.post("/register", (req, res) => {
   } else {
     users[id] = {
       id,
-      username,
+      // username,
       email,
       hashedPassword
     };
@@ -149,11 +149,10 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const bcrypt = require('bcrypt');
   const email = req.body.email;
-  const hashedpassword = req.body.hashedPassword;
+  const password = req.body.password;
   const currentAccount = lookUpAccount(users, email);
-  if (!emailExist(users, email) || !(currentAccount.password === password)) {
+  if (!emailExist(users, email) || !isEqualToHash(password, currentAccount.hashedPassword)) {
     console.log("STATUS 403")
   } else {
     res.cookie('userID', currentAccount.id)
@@ -176,9 +175,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  console.log(req.params)
-  console.log(req.body)
-
   const shortUrl = req.params.shortURL
   const longURL = req.body.longURL;
   const userID = req.cookies["userID"]
