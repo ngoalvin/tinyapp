@@ -35,6 +35,7 @@ const isEqualToHash = function(password, hashedPassword) {
   return bcrypt.compareSync(password, hashedPassword);
 }
 
+
 const userDatabase = function(userID, urlDatabase) {
   const newDatabase = {}
   for (let user in urlDatabase) {
