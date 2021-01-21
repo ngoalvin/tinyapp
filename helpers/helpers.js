@@ -50,6 +50,7 @@ const userDatabase = function(userID, urlDatabase) {
   return newDatabase;
 };
 
+//returns message according to the error code
 const statusMessage = function(status) {
   if (status === 200) {
     return 'OK';
@@ -58,24 +59,27 @@ const statusMessage = function(status) {
   } else if (status === 400) {
     return 'The email already exists';
   } else if (status === 409) {
-    return 'This already exists think of something more original please'
+    return 'This already exists think of something more original please';
   } else if (status === 401) {
-    return 'You not logged in bro';
+    return 'You not authorized bro';
+  } else if (status === 404) {
+    return 'DOES NOT EXIST';
   }
-}
+  return "Hey man I am just as confused as you.";
+};
 
 const changeStatus = function(status, code) {
   status = code;
   return status;
-}
+};
 
-module.exports = { 
-  generateRandomString, 
-  emailExist, 
-  getUserByEmail, 
-  hashPassword, 
-  isEqualToHash, 
-  userDatabase, 
+module.exports = {
+  generateRandomString,
+  emailExist,
+  getUserByEmail,
+  hashPassword,
+  isEqualToHash,
+  userDatabase,
   statusMessage,
   changeStatus
 };

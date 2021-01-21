@@ -137,8 +137,6 @@ app.post("/urls/:id", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   status = res.statusCode;
-  // console.log("PARAMS OVER HERE:", req.params)
-  // const longURL = urlDatabase[req.params.shortURL]
   const shortURL = req.params.shortURL;
   const urlData = urlDatabase[shortURL];
   if (!urlData) {
@@ -213,7 +211,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const currentAccount = getUserByEmail(email, users);
-  //checking if email exists and if password match
+  //checking if email exists or if password don't match
   if (!emailExist(users, email) || !isEqualToHash(password, currentAccount.hashedPassword)) {
     status = changeStatus(res.statusCode, 403);
     res.redirect("/status");
@@ -229,7 +227,6 @@ app.get("/status", (req, res) => {
     status,
     message : statusMessage(status)
   };
-  console.log(templateVars);
   res.render("status_page", templateVars);
 });
 

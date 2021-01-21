@@ -7,7 +7,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
-    <title>Registration</title>
+    <title>Create An Account</title>
   </head>
 
   <body>
@@ -15,16 +15,15 @@
     <%- include('partials/_header') %>
 
     <main style="margin: 1em;">
-      <h3>Registration</h3>
+      <h3>Create An Account</h3>
       <form class="form-group" action="/register" method="POST">
-        <div class="form-group mb-2">
-          <label for="username">Username:</label>
-          <input class="form-control" type="text" name="username" placeholder="Just write something!" style="width: 300px; margin: 1em">
-          <label for="password">Password:</label>
-          <input class="form-control" type="text" name="password" placeholder="Just write something!" style="width: 300px;margin: lem">
-          <label for="email">Email:</label>
-          <input class="form-control" type="text" name="email" placeholder="Just write something!" style="width: 300px;margin: lem"><button type="submit" class="btn btn-primary">Submit</button>
-        </div>
+        <label for="username">Username:</label>
+        <input class="form-control" type="text" name="username" placeholder="Just write something!" style="width: 300px">
+        <label for="password">Password:</label>
+        <input class="form-control" type="text" name="password" placeholder="Just write something!" style="width: 300px;margin: lem">
+        <label for="email">Email:</label>
+        <input class="form-control" type="text" name="email" placeholder="Just write something!" style="width: 300px;margin: lem">
+        <button type="submit" class="btn btn-primary" style="margin-top:1em">Submit</button>
       </form>
     </main>
       <!-- Bootstrap JS -->
