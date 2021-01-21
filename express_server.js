@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const {generateRandomString, emailExist, lookUpAccount, hashPassword, isEqualToHash} = require("./helpers/helpers");
+const {generateRandomString, emailExist, getUserByEmail, hashPassword, isEqualToHash} = require("./helpers/helpers");
 
 const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
@@ -134,7 +134,6 @@ app.post("/register", (req, res) => {
       hashedPassword
     };
     req.session.userID = id;
-    console.log("cookie", req.session.userID)
     res.redirect("/urls");
   }
 })
@@ -158,7 +157,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const currentAccount = lookUpAccount(users, email);
+  const currentAccount = getUserByEmail(email, users);
   if (!emailExist(users, email) || !isEqualToHash(password, currentAccount.hashedPassword)) {
     console.log("STATUS 403")
   } else {
@@ -173,8 +172,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const userID = req.session.userID
   const urlInfo = urlDatabase[req.params.shortURL];
 
-  console.log(userID);
-  console.log(urlInfo)
   if (urlInfo.userID === userID || urlInfo.userID === 'aJ48lW') {
     delete urlDatabase[req.params.shortURL];
   } 

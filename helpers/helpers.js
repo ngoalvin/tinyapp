@@ -18,7 +18,7 @@ const emailExist = function(users, email) {
   return false;
 }
 
-const lookUpAccount = function(users, email) {
+const getUserByEmail = function(email, users) {
   for (let key in users) {
     if (users[key].email === email) {
       return users[key]
@@ -35,4 +35,16 @@ const isEqualToHash = function(password, hashedPassword) {
   return bcrypt.compareSync(password, hashedPassword);
 }
 
-module.exports = { generateRandomString, emailExist, lookUpAccount, hashPassword, isEqualToHash }
+const userDatabase = function(userID, urlDatabase) {
+  const newDatabase = {}
+  for (let user in urlDatabase) {
+    const currentID = urlDatabase[user].userID
+    if (currentID === userID || currentID === "aJ48lW") {
+      newDatabase[user] = urlDatabase[user]
+    }
+  }
+  return newDatabase;
+}
+
+
+module.exports = { generateRandomString, emailExist, getUserByEmail, hashPassword, isEqualToHash, userDatabase }
