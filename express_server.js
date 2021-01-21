@@ -222,6 +222,8 @@ app.post("/login", (req, res) => {
   }
 });
 
+//----------------------------------- STATUS-------------------------------
+
 app.get("/status", (req, res) => {
   const templateVars = {
     status,
@@ -230,6 +232,7 @@ app.get("/status", (req, res) => {
   res.render("status_page", templateVars);
 });
 
+//----------------------------------------------EDIT/DELETE-----------------------
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const userID = req.session.userID;
