@@ -2,15 +2,15 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const {
-  generateRandomString, 
-  emailExist, 
-  getUserByEmail, 
-  hashPassword, 
-  isEqualToHash, 
+  generateRandomString,
+  emailExist,
+  getUserByEmail,
+  hashPassword,
+  isEqualToHash,
   userDatabase,
   statusMessage,
   changeStatus
-  } = require("./helpers/helpers");
+} = require("./helpers/helpers");
 
 const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
@@ -44,13 +44,15 @@ app.get("/urls", (req, res) => {
   status = res.statusCode;
   if (!isLoggedIn) {
     status = changeStatus(res.statusCode, 401);
-    res.redirect("/status")
+    res.redirect("/status");
   } else {
     const userID = req.session.userID;
     const usersUrl = userDatabase(userID, urlDatabase);
+    const email = users[userID].email;
     const templateVars = {
       userID,
       isLoggedIn,
+      email,
       urls : usersUrl,
     };
     res.render("urls_index", templateVars);
@@ -80,9 +82,12 @@ app.get("/urls/new", (req, res) => {
   if (!isLoggedIn) {
     res.redirect("/login");
   } else {
+    const userID = req.session.userID;
+    const email = users[userID].email;
     const templateVars = {
       userID: req.session.userID,
-      isLoggedIn
+      isLoggedIn,
+      email
     };
     res.render("urls_new", templateVars);
   }
@@ -95,13 +100,39 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   status = res.statusCode;
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    userID: req.session.userID,
-    isLoggedIn
-  };
-  res.render("urls_show", templateVars);
+  if (isLoggedIn) {
+    const userID = req.session.userID;
+    const shortURL = req.params.shortURL;
+    const urlData = urlDatabase[shortURL];
+    if (!urlData) {
+      status = changeStatus(res.statusCode, 404);
+      res.redirect("/status");
+      //checks if logged in user owns the URL
+    } else if (urlData.userID === userID) {
+      const longURL = urlData.longURL;
+      const email = users[userID].email;
+      const templateVars = {
+        shortURL,
+        longURL,
+        userID,
+        isLoggedIn,
+        email
+      };
+      res.render("urls_show", templateVars);
+    }
+  } else {
+    status = changeStatus(res.statusCode, 401);
+    res.redirect("/status");
+  }
+});
+
+app.post("/urls/:id", (req, res) => {
+  const currentURL = req.params.id;
+  const userID = req.session.userID;
+  const currentAccount = userDatabase(userID, urlDatabase);
+  if (currentAccount[currentURL]) {
+    res.redirect(`${currentURL}`);
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -109,44 +140,44 @@ app.get("/u/:shortURL", (req, res) => {
   // console.log("PARAMS OVER HERE:", req.params)
   // const longURL = urlDatabase[req.params.shortURL]
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
-  res.redirect(longURL);
-});
-
-app.post("/urls/:id", (req, res) => {
-  const currentURL = req.params.id;
-  const userID = req.session.userID;
-  const currentAccount = userDatabase(userID, urlDatabase)
-  console.log("OVER HERE", currentAccount[currentURL])
-  if (currentAccount[currentURL]) {
-    res.redirect(`${currentURL}`);
+  const urlData = urlDatabase[shortURL];
+  if (!urlData) {
+    status = changeStatus(res.statusCode, 404);
+    res.redirect("/status");
+  } else {
+    const longURL = urlData.longURL;
+    res.redirect(longURL);
   }
 });
+
 
 //--------------------------------------------REGISTRATION----------------------------------------
 
 app.get("/register", (req, res) => {
   status = res.statusCode;
-  const templateVars = {
-    userID: req.session.userID,
-    isLoggedIn,
-  };
-  res.render("urls_registration", templateVars);
+  if (isLoggedIn) {
+    res.redirect("/urls");
+  } else {
+    const templateVars = {
+      userID: req.session.userID,
+      isLoggedIn,
+    };
+    res.render("urls_registration", templateVars);
+  }
 });
 
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  const hashedPassword = hashPassword(password);
-
   if (!(email && password)) {
-    status = changeStatus(res.statusCode, 400)
-    res.redirect("/status")
+    status = changeStatus(res.statusCode, 400);
+    res.redirect("/status");
   } else if (emailExist(users, email)) {
-    status = changeStatus(res.statusCode, 409)
+    status = changeStatus(res.statusCode, 409);
     res.redirect("/status");
   } else {
+    const hashedPassword = hashPassword(password);
     users[id] = {
       id,
       email,
@@ -167,20 +198,25 @@ app.post("/logout", (req,res) => {
 
 app.get("/login", (req, res) => {
   status = res.statusCode;
-  const templateVars = {
-    userID: req.session.userID,
-    isLoggedIn,
-  };
-  res.render("urls_login", templateVars);
+  if (isLoggedIn) {
+    res.redirect("/urls");
+  } else {
+    const templateVars = {
+      userID: req.session.userID,
+      isLoggedIn,
+    };
+    res.render("urls_login", templateVars);
+  }
 });
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const currentAccount = getUserByEmail(email, users);
+  //checking if email exists and if password match
   if (!emailExist(users, email) || !isEqualToHash(password, currentAccount.hashedPassword)) {
-    status = changeStatus(res.statusCode, 403)
-    res.redirect("/status")
+    status = changeStatus(res.statusCode, 403);
+    res.redirect("/status");
   } else {
     req.session.userID = currentAccount.id;
     isLoggedIn = true;
@@ -192,23 +228,25 @@ app.get("/status", (req, res) => {
   const templateVars = {
     status,
     message : statusMessage(status)
-  }
-  console.log(templateVars)
-  res.render("status_page", templateVars)
-})
+  };
+  console.log(templateVars);
+  res.render("status_page", templateVars);
+});
 
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const userID = req.session.userID;
-  const userURLS = userDatabase(userID, urlDatabase);
   const urlInfo = urlDatabase[req.params.shortURL];
 
   if (isLoggedIn) {
     if (urlInfo.userID === userID || urlInfo.userID === 'aJ48lW') {
       delete urlDatabase[req.params.shortURL];
+      res.redirect("/urls");
     }
+  } else {
+    status = changeStatus(res.statusCode, 401);
+    res.redirect("/status");
   }
-  res.redirect(`/urls`);
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
@@ -217,6 +255,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const userID = req.session.userID;
   const urlInfo = urlDatabase[shortURL];
 
+  //check if userID of person is same as userID of URL
   if (urlInfo.userID === userID || urlInfo.userID === 'aJ48lW') {
     urlDatabase[shortURL] = { longURL, userID };
   }
