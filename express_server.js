@@ -27,11 +27,7 @@ app.use(cookieSession({
 
 app.set("view engine", "ejs");
 
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
-};
-
+const urlDatabase = {};
 const users = {};
 
 let status = 200;
@@ -239,7 +235,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const urlInfo = urlDatabase[req.params.shortURL];
 
   if (isLoggedIn) {
-    if (urlInfo.userID === userID || urlInfo.userID === 'aJ48lW') {
+    if (urlInfo.userID === userID) {
       delete urlDatabase[req.params.shortURL];
       res.redirect("/urls");
     }
@@ -256,7 +252,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const urlInfo = urlDatabase[shortURL];
 
   //check if userID of person is same as userID of URL
-  if (urlInfo.userID === userID || urlInfo.userID === 'aJ48lW') {
+  if (urlInfo.userID === userID) {
     urlDatabase[shortURL] = { longURL, userID };
   }
   res.redirect(`/urls/${shortURL}`);
