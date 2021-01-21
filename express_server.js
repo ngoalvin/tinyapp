@@ -3,12 +3,12 @@ const app = express();
 const PORT = 8080; // default port 8080
 const {generateRandomString, emailExist, lookUpAccount, hashPassword, isEqualToHash} = require("./helpers/helpers");
 
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession());
 
 app.set("view engine", "ejs");
 
