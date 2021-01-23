@@ -11,7 +11,7 @@
       </div>
       <div class="navbar-nav">
         <% if (isLoggedIn) { %>
-          <a style="margin: auto;">Logged in as <%= email %>:</a>
+          <a style="margin: auto;">Logged in as: <%= email %></a>
           <div class="fixed-right" style="margin-right:auto;">
           <form method="POST" action="/logout" class="form-inline">
             <button type="submit" class="btn btn-primary" style="margin-top:1em;">Logout</button>

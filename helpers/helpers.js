@@ -64,6 +64,8 @@ const statusMessage = function(status) {
     return 'You not authorized bro';
   } else if (status === 404) {
     return 'DOES NOT EXIST';
+  } else if (status === 406) {
+    return 'Please fill out the fields';
   }
   return "Hey man I am just as confused as you.";
 };

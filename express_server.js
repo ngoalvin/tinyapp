@@ -115,6 +115,9 @@ app.get("/urls/:shortURL", (req, res) => {
         email
       };
       res.render("urls_show", templateVars);
+    } else {
+      status = changeStatus(res.statusCode, 401);
+      res.redirect("/status");
     }
   } else {
     status = changeStatus(res.statusCode, 401);
@@ -165,7 +168,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   if (!(email && password)) {
-    status = changeStatus(res.statusCode, 400);
+    status = changeStatus(res.statusCode, 406);
     res.redirect("/status");
   } else if (emailExist(users, email)) {
     status = changeStatus(res.statusCode, 409);
@@ -178,7 +181,8 @@ app.post("/register", (req, res) => {
       hashedPassword
     };
     req.session.userID = id;
-    res.redirect("/");
+    isLoggedIn = true;
+    res.redirect("/urls");
   }
 });
 
@@ -238,6 +242,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     if (urlInfo.userID === userID) {
       delete urlDatabase[req.params.shortURL];
       res.redirect("/urls");
+    } else {
+      status = changeStatus(res.statusCode, 401);
+      res.redirect("/status");
     }
   } else {
     status = changeStatus(res.statusCode, 401);
@@ -254,8 +261,11 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   //check if userID of person is same as userID of URL
   if (urlInfo.userID === userID) {
     urlDatabase[shortURL] = { longURL, userID };
+  } else {
+    status = changeStatus(res.statusCode, 401);
+    res.redirect("/status");
   }
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls`);
 });
 
 app.listen(PORT, () => {
